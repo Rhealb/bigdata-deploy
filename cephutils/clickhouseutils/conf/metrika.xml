@@ -1,0 +1,43 @@
+<yandex>
+     <dynamic_log_level><level>error</level></dynamic_log_level>
+     <clickhouse_remote_servers>
+      <test_shard_localhost>
+       <shard>
+         <replica>
+           <host>localhost</host>
+           <port>9000</port>
+         </replica>
+       </shard>
+      </test_shard_localhost>
+<!--      <all_servers>
+        <shard><replica><host>ch-0</host><port>9000</port></replica></shard>
+        <shard><replica><host>ch-1</host><port>9000</port></replica></shard>
+        <shard><replica><host>ch-2</host><port>9000</port></replica></shard>
+      </all_servers>-->
+     </clickhouse_remote_servers>
+     <graphite_rollup>   
+      <default>    
+       <function>avg</function>  
+       <retention>  
+         <age>0</age>  
+         <precision>1</precision>  
+       </retention>  
+       <retention>  
+         <age>604800</age>  
+         <precision>60</precision>  
+       </retention>  
+       <retention>  
+         <age>2592000</age>  
+         <precision>86400</precision>  
+       </retention>   
+      </default>  
+     </graphite_rollup>
+     <networks> <ip>::/0</ip> </networks>
+     <clickhouse_compression>
+      <case>
+       <min_part_size>10000000000</min_part_size>  
+       <min_part_size_ratio>0.01</min_part_size_ratio>
+       <method>lz4</method>
+      </case>
+     </clickhouse_compression>
+</yandex>

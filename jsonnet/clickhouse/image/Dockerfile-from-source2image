@@ -1,0 +1,27 @@
+FROM ubuntu:16.04
+
+RUN apt-get update && \
+    apt-get install -y git pbuilder debhelper lsb-release fakeroot sudo debian-archive-keyring debian-keyring cmake ninja-build 
+RUN apt-get install -y software-properties-common && \
+    apt-add-repository ppa:ubuntu-toolchain-r/test && \
+    apt-get update && \
+    apt-get install -y gcc-7 g++-7 && \
+    apt-get install -y libicu-dev libreadline-dev
+RUN cd /opt && git clone --recursive --branch stable https://github.com/yandex/ClickHouse.git && \
+    cd ClickHouse && mkdir build && export CC=gcc-7 && export CXX=g++-7 && \
+    cd build && cmake .. && ninja clickhouse && \
+    cp dbms/programs/clickhouse /usr/bin/ && rm -rf /opt/ClickHouse
+
+COPY config.xml /etc/clickhouse-server/config.xml
+RUN ln -s /usr/bin/clickhouse /usr/bin/clickhouse-server && ln -s /usr/bin/clickhouse /usr/bin/clickhouse-client
+
+COPY entrypoint.sh /opt/entrypoint.sh
+RUN chmod a+x /opt/entrypoint.sh
+
+EXPOSE 9000 8123 9009 4242
+VOLUME /var/lib/clickhouse
+
+ENV CLICKHOUSE_CONFIG /etc/clickhouse-server/config.xml
+ENV SERVER_ID unknow
+
+ENTRYPOINT sed -i "s/#SERVER_ID#/${SERVER_ID}/g" /etc/clickhouse-server/config.xml && exec /usr/bin/clickhouse-server --config=${CLICKHOUSE_CONFIG}
